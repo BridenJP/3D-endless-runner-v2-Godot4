@@ -1,0 +1,72 @@
+[gd_scene load_steps=8 format=3 uid="uid://buyimc8rykscg"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_yr8qg"]
+radius = 0.25
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_soaf6"]
+load_path = "res://.godot/imported/patterned_clay_wall_nor_gl_1k.jpg-035737a19d3c7e10dc40b63b30139153.s3tc.ctex"
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_obk6e"]
+transparency = 1
+blend_mode = 1
+albedo_color = Color(1, 1, 1, 0.858824)
+emission_enabled = true
+emission = Color(0.94902, 0.811765, 0.262745, 1)
+normal_enabled = true
+normal_texture = SubResource("CompressedTexture2D_soaf6")
+
+[sub_resource type="SphereMesh" id="SphereMesh_t4k7r"]
+material = SubResource("StandardMaterial3D_obk6e")
+radius = 0.25
+height = 0.5
+
+[sub_resource type="Animation" id="Animation_uewkm"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:mesh:material:emission")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Color(0.94902, 0.811765, 0.262745, 1)]
+}
+
+[sub_resource type="Animation" id="Animation_4t5x3"]
+resource_name = "glow"
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath(".:mesh:material:emission")
+tracks/0/interp = 1
+tracks/0/loop_wrap = false
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Color(0.94902, 0.811765, 0.262745, 1), Color(0.94902, 0, 0.8, 1)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_ks7ry"]
+_data = {
+"RESET": SubResource("Animation_uewkm"),
+"glow": SubResource("Animation_4t5x3")
+}
+
+[node name="Collectible" type="Area3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("SphereShape3D_yr8qg")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("SphereMesh_t4k7r")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="MeshInstance3D"]
+libraries = {
+"": SubResource("AnimationLibrary_ks7ry")
+}
+autoplay = "glow"

@@ -1,0 +1,107 @@
+[gd_scene load_steps=8 format=3 uid="uid://fnnrgh54rfam"]
+
+[ext_resource type="Script" path="res://Scripts/player.gd" id="1_5xk0x"]
+[ext_resource type="Script" path="res://Scripts/world.gd" id="1_y2vjw"]
+[ext_resource type="PackedScene" uid="uid://dybop2ilvqyfa" path="res://Assets/Models/3DGodotRobot.glb" id="2_3rivv"]
+[ext_resource type="PackedScene" uid="uid://dyqnlo4b0rx8i" path="res://Objects/track_segment.tscn" id="4_t6yru"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_n2ir1"]
+height = 1.8
+
+[sub_resource type="GDScript" id="GDScript_lneki"]
+script/source = "extends Node3D
+
+#const TRACK_LEN = 100
+#
+## Preload track segment
+#var track_prefab = preload(\"res://track_segment.tscn\")
+#
+#var milestone # next change of track
+#var track_index # which track we will change
+#var tracks # array of tracks
+#var track_z # z pos of next track
+#
+#func reposition_next_track(track: TrackSegment):
+	#track.global_transform.origin.z = track_z
+	#track_z -= TRACK_LEN
+	#track.create_obstacles()
+#
+## Called when the node enters the scene tree for the first time.
+#func _ready():
+	#var track0 = track_prefab.instantiate()
+	#var track1 = track_prefab.instantiate()
+	#tracks = [track0, track1]
+	#add_child(track0)
+	#add_child(track1)
+#
+	#track_z = -TRACK_LEN * 0.5
+	#reposition_next_track(track0)
+	#reposition_next_track(track1)
+#
+#func _process():
+	#if $
+"
+
+[sub_resource type="Theme" id="Theme_8kwvk"]
+default_font_size = 90
+
+[node name="World" type="Node3D"]
+script = ExtResource("1_y2vjw")
+
+[node name="Sun" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
+shadow_enabled = true
+
+[node name="Player" type="CharacterBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.8, 0)
+script = ExtResource("1_5xk0x")
+
+[node name="PlayerColl" type="CollisionShape3D" parent="Player"]
+shape = SubResource("CapsuleShape3D_n2ir1")
+
+[node name="PlayerModel" parent="Player" instance=ExtResource("2_3rivv")]
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 0, -0.8, 0)
+
+[node name="Camera" type="Camera3D" parent="Player"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 3)
+
+[node name="Timer" type="Timer" parent="Player"]
+process_callback = 0
+wait_time = 10.0
+one_shot = true
+
+[node name="RestartTimer" type="Timer" parent="Player"]
+wait_time = 2.2
+
+[node name="Tracks" type="Node3D" parent="."]
+script = SubResource("GDScript_lneki")
+
+[node name="TrackSegment" parent="Tracks" instance=ExtResource("4_t6yru")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -50)
+
+[node name="TrackSegment2" parent="Tracks" instance=ExtResource("4_t6yru")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -150)
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="ScoreLabel" type="Label" parent="HUD"]
+offset_left = 10.0
+offset_top = 10.0
+offset_right = 70.0
+offset_bottom = 33.0
+text = "score: 0"
+
+[node name="Start" type="CanvasLayer" parent="."]
+
+[node name="Button" type="Button" parent="Start"]
+offset_left = 156.0
+offset_top = 128.0
+offset_right = 1016.0
+offset_bottom = 322.0
+theme = SubResource("Theme_8kwvk")
+text = "START
+"
+
+[connection signal="timeout" from="Player/Timer" to="Player" method="_on_timer_timeout"]
+[connection signal="timeout" from="Player/RestartTimer" to="Player" method="_on_restart_timer_timeout"]
+[connection signal="pressed" from="Start/Button" to="." method="_on_button_pressed"]
