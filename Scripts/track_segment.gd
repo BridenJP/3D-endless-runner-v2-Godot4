@@ -2,66 +2,67 @@ extends Node3D
 class_name TrackSegment
 
 # Preload track segment and obstacles
-var box_obstacle = preload("res://Objects/box_obstacle.tscn")
-var collectible = preload("res://Objects/collectible.tscn")
+const BOX_OBSTACLE: PackedScene = preload("res://Objects/box_obstacle.tscn")
+const COLLECTIBLE: PackedScene = preload("res://Objects/collectible.tscn")
 
 # Center position of the obstacles (x coordinate)
-var lanes = [-3.3, 0, 3.3]
+const LANES: Array[float] = [-3.3, 0, 3.3]
 
 # Save the parent for later use
 var main: Node3D
 var player_collect: Callable
 
-func set_main(value):
-	main = value
+func set_main(node: Node3D) -> void:
+	main = node
 	player_collect = Callable(main, "_on_player_collect")
 
-func clear_children_of(node):
+func clear_children_of(node: Node3D) -> void:
 	# Free up all the children - we do this when we reuse the track
-	var children = node.get_children()
+	var children: Array[Node] = node.get_children()
 	for child in children:
 		child.queue_free()  # Safely mark the child for deletion
 
-func random_pos(z):
+func random_pos(z: float) -> Vector3:
 	# Randomly select a lane
-	var lane_index = randi() % lanes.size()  
+	var lane_index: int = randi() % LANES.size()  
 	# Randomly select high or low position
-	var height_index = randi() % 2 
+	var height_index: int = randi() % 2 
 
-	return Vector3(lanes[lane_index], 0.5 + height_index * 1.5, z)
+	return Vector3(LANES[lane_index], 0.5 + height_index * 1.5, z)
 
-func create_obstacle_at(pos):
+func create_obstacle_at(pos: Vector3) -> void:
 	# New obstacle
-	var obstacle = box_obstacle.instantiate()
+	var obstacle: Node3D = BOX_OBSTACLE.instantiate()
 	# Add inside the Obstacles node - we clean this up later
 	$Obstacles.add_child(obstacle)
 	# Position relative to this track segment
 	obstacle.transform.origin = pos
 
-func create_collectible_at(pos):
+func create_collectible_at(pos: Vector3) -> void:
 	# New collectible
-	var collect = collectible.instantiate()
+	var collectible: Node3D = COLLECTIBLE.instantiate()
 	# Add inside the Obstacles node - we clean this up later
-	$Collectibles.add_child(collect)
+	$Collectibles.add_child(collectible)
 	# Position relative to this track segment
-	collect.transform.origin = pos
+	collectible.transform.origin = pos
 	# Connect our collision signal
-	collect.connect("body_entered", player_collect.bind(collect))
+	collectible.connect("body_entered", player_collect.bind(collectible))
 
-func create_objects(first_track):
+func create_objects(first_track: bool) -> void:
 	# Clear each time
 	clear_children_of($Obstacles)
 	clear_children_of($Collectibles)
 
 	# Break down our 100m into 40 subpositions (every 2.5 m)
-	for i in range(4 if first_track else 0, 40):
-		var z = 50 - i * 2.5
-		var obstacle_pos = null
+	# For the first track we leave the first 15m empty (6 x 2.5)
+	for i in range(6 if first_track else 0, 40):
+		var z: float = 50 - i * 2.5
+		var obstacle_pos: Vector3
 		# Every 4th time (10m) we do an obstacle
 		if i % 4 == 0:
 			obstacle_pos = random_pos(z)
 			create_obstacle_at(obstacle_pos)
-		var collectible_pos = random_pos(z)
+		var collectible_pos: Vector3 = random_pos(z)
 		# Avoid overlap
 		while collectible_pos == obstacle_pos:
 			collectible_pos = random_pos(z)

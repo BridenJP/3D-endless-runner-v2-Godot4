@@ -1,9 +1,8 @@
-[gd_scene load_steps=8 format=3 uid="uid://fnnrgh54rfam"]
+[gd_scene load_steps=7 format=3 uid="uid://fnnrgh54rfam"]
 
 [ext_resource type="Script" path="res://Scripts/player.gd" id="1_5xk0x"]
 [ext_resource type="Script" path="res://Scripts/world.gd" id="1_y2vjw"]
 [ext_resource type="PackedScene" uid="uid://dybop2ilvqyfa" path="res://Assets/Models/3DGodotRobot.glb" id="2_3rivv"]
-[ext_resource type="PackedScene" uid="uid://dyqnlo4b0rx8i" path="res://Objects/track_segment.tscn" id="4_t6yru"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_n2ir1"]
 height = 1.8
@@ -65,9 +64,9 @@ transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 0, -0.
 [node name="Camera" type="Camera3D" parent="Player"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 3)
 
-[node name="Timer" type="Timer" parent="Player"]
+[node name="SliderTimer" type="Timer" parent="Player"]
 process_callback = 0
-wait_time = 10.0
+wait_time = 0.8
 one_shot = true
 
 [node name="RestartTimer" type="Timer" parent="Player"]
@@ -75,12 +74,6 @@ wait_time = 2.2
 
 [node name="Tracks" type="Node3D" parent="."]
 script = SubResource("GDScript_lneki")
-
-[node name="TrackSegment" parent="Tracks" instance=ExtResource("4_t6yru")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -50)
-
-[node name="TrackSegment2" parent="Tracks" instance=ExtResource("4_t6yru")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -150)
 
 [node name="HUD" type="CanvasLayer" parent="."]
 
@@ -102,6 +95,6 @@ theme = SubResource("Theme_8kwvk")
 text = "START
 "
 
-[connection signal="timeout" from="Player/Timer" to="Player" method="_on_timer_timeout"]
+[connection signal="timeout" from="Player/SliderTimer" to="Player" method="_on_slider_timer_timeout"]
 [connection signal="timeout" from="Player/RestartTimer" to="Player" method="_on_restart_timer_timeout"]
 [connection signal="pressed" from="Start/Button" to="." method="_on_button_pressed"]

@@ -1,50 +1,50 @@
 extends Node3D
 
-const TRACK_LEN = 100
-const N_SEGMENTS = 3
+const TRACK_LEN: float = 100
+const N_SEGMENTS: int = 3
 
 # Preload track segment
-var track_prefab = preload("res://Objects/track_segment.tscn")
+const TRACK_SEGMENT: PackedScene = preload("res://Objects/track_segment.tscn")
 
-var milestone # next change of track
-var track_index # which track we will change
-var tracks # array of tracks
-var track_z # z pos of next track
-var first_track # the first track we don't have our objects too close
-var score # keep score
+var milestone: float # next change of track
+var track_index: int # which track we will change
+var tracks: Array # array of tracks
+var track_z: float # z pos of next track
+var first_track: bool # the first track we don't have our objects too close
+var score: int # keep score
 
-func _ready():
+func _ready() -> void:
 	set_process(false)
 	set_physics_process(false)
 	$Player.hide()
 	$HUD.hide()
 	$Start.show()
 
-func _process(delta):
+func _process(_delta: float) -> void:
 	# If we're gone past the end of a track segment, we can reuse it
 	if (milestone - $Player.global_transform.origin.z) > 10:
 		position_next_track()
 
-func position_next_track():
-	var track: TrackSegment = tracks[track_index]
+func position_next_track() -> void:
+	var track: Node3D = tracks[track_index]
 	track.global_transform.origin.z = track_z
 	track.create_objects(first_track)
 	track_z -= TRACK_LEN
 	milestone -= TRACK_LEN
 	track_index = (track_index + 1) % N_SEGMENTS
 
-func _on_player_collect(player, collect):
+func _on_player_collect(_player: Player, collectible: Area3D) -> void:
 	score += 5
 	$HUD/ScoreLabel.text = "score: " + str(score)
-	collect.queue_free()
+	collectible.queue_free()
 
-func play():
+func play() -> void:
 	score = 0
 	first_track = true
 	# Create 2 tracks and add them to the Tracks node
 	tracks = []
 	for i in range(N_SEGMENTS):
-		var track = track_prefab.instantiate()
+		var track: Node3D = TRACK_SEGMENT.instantiate()
 		tracks.append(track)
 		track.set_main(self)
 		$Tracks.add_child(track)
@@ -66,7 +66,7 @@ func play():
 	set_physics_process(true)
 	set_process(true)
 
-func _on_button_pressed():
+func _on_button_pressed() -> void:
 	$Start.hide()
 	$HUD.show()
 	play()

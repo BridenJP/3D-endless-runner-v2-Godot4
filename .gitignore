@@ -5,6 +5,7 @@ export.cfg
 export_presets.cfg
 *.translation
 *.tmp
+*.bak
 
 # Godot generated folders
 .import/

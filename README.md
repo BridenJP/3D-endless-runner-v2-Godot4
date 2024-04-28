@@ -1,11 +1,16 @@
-# Godot: 3D endless runner sample
+# Godot: 3D endless runner sample (V2)
 
-This Godot (4.2) project is a _very simple_ sample of a 3D endless runner game. It implements some of the basics of this genre:
+This Godot (4.2) project is an update to the _very simple_ sample of a 3D endless runner game. It implements some of the basics of this genre:
 
 1. The player runs endlessly.
 1. There is a track with 3 lanes. The player switches from lane to lane with arrow keys.
 1. There are obstacles to avoid. Hitting an obstacle ends the game.
 1. There are collectibles to collect. Touching a collectible removes it and adds to the score.
+
+## NEW features
+1. The tracks are replaced endlessly with respawned obstacles and collectibles.
+1. There is a score.
+1. There is a start button.
 
 ## Keys:
 
